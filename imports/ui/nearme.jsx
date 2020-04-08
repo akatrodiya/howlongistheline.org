@@ -9,8 +9,6 @@ import { Tracker } from 'meteor/tracker'
 import { toast } from 'react-toastify';
 import { useCookies } from 'react-cookie';
 
-
-
 function Index({ history }) {
   {/*Initialise props*/}
   const [clientLocation, setclientLocation] = useCookies(['location']);
@@ -49,7 +47,6 @@ function Index({ history }) {
   }, [search])
 
 
-
 function checkClientLocation() {
   if (clientLocation.location != undefined) {
     if ((new Date().getTime() - new Date(clientLocation.location.time).getTime()) / 1000 < 300) {
@@ -82,7 +79,7 @@ function getClientLocation() {
   function error(err) {
     setLoading(false)
     console.log("nm location failure")
-    toast("Cant get current location, please turn on browser's geolocation function and refresh, or try a different browser")
+    toast("Cant get current location, please try a different browser if this continues")
     console.warn(`ERROR(${err.code}): ${err.message}`);
   }
 
@@ -93,7 +90,7 @@ function getClientLocation() {
 
   function fetchNearestShops(latitude, longitude) {
       console.log("CLT updating nearest shops")
-      var lat; 
+      var lat;
       var long;
       if(clientLocation.location == undefined){
         lat = latitude;
@@ -181,13 +178,14 @@ function getClientLocation() {
                       Meteor.call('locations.updatelinesize', location._id, position.coords.longitude, position.coords.latitude, event.target.value, function (err, result) {
                         console.log(event.type)
                           if (err) {
-                              toast("Are you at this shop right now?")
+                              // toast("Are you at this shop right now? Looks like you current location is different with the shop's location in our record")
+                              history.push("/editLine?id="+location._id+"&lineSize="+event.target.value, {location: location})
                               console.log(err)
                               return
                           }
                           // setLoading(false)
-                          toast("Thank You!")
-                          history.push('/')
+                          alert("The shop has been updated, thank you!")
+                          history.go(0)
                       });
                   })
                 }}}
@@ -214,7 +212,7 @@ function getClientLocation() {
           </div>
           <div style={{ marginBottom: 55 }}>
                 <Card>
-                This site is still developing. It is constantly being improved by volunteers. If something is broken, check back a few days later and it will probably be fixed.
+                This site is constantly being improved by volunteers. If something is broken, check back a few days later and it will probably be fixed. Go <a href="https://github.com/howlongistheline/howlongistheline.org/issues">here</a> to see what we are currently working on.
                 </Card>
               <ListTitle>
                   All Shops
